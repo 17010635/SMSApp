@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.lang.reflect.Array;
+
 public class MainActivity extends AppCompatActivity {
     EditText etTo, etMsg;
     Button btnSend, btnSendVIAMsg;
@@ -32,27 +34,29 @@ public class MainActivity extends AppCompatActivity {
         etTo = findViewById(R.id.editTextTo);
         etMsg = findViewById(R.id.editTextMSG);
         btnSend = findViewById(R.id.buttonSend);
-        btnSendVIAMsg = findViewById(R.id.buttonSendMsg);
+        btnSendVIAMsg = findViewById(R.id.buttonSendMsg);;
 
-        to = etTo.getText().toString();
-        msg = etMsg.getText().toString();
         btnSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SmsManager smsManager = SmsManager.getDefault();
-                smsManager.sendTextMessage(to, null, msg,null ,null);
+                String[] split = etTo.getText().toString().split(",");
+                for (String i : split){
+                    smsManager.sendTextMessage(i, null, etMsg.getText().toString(),null ,null);
+                }
+
+
             }
         });
 
         btnSendVIAMsg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("uuu", "uuu");
-                Uri smsUri = Uri.parse("tel:" + to);
-                Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
-                intent.putExtra("address", to);
-                intent.putExtra("sms_body", msg);
-                intent.setType("vnd.android-dir/mms-sms");//here setType will set the previous data null.
+                String to = etTo.getText().toString();
+                String message = etMsg.getText().toString();
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse("sms:" + to));
+                intent.putExtra("sms_body", message);
                 startActivity(intent);
 
             }
@@ -74,6 +78,7 @@ public class MainActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, permissionNeeded, 1);
         }
     }
+
 
     @Override
     protected  void onDestroy(){
